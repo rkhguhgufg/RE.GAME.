@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dino Game - Abdarrahim Elkarmani</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: 40px auto 0;
+      background: #fff;
+      border: 3px solid #2c3e50;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      color: #00796b;
+      font-size: 28px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🦖 Dino Game by Abdarrahim Elkarmani</h1>
+  <canvas id="game" width="900" height="250"></canvas>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    let dino = { x: 80, y: 190, vy: 0, width: 50, height: 50, jumping: false };
+    const gravity = 2;
+    const ground = 190;
+    let obstacles = [];
+    let frame = 0;
+    let score = 0;
+    let gameOver = false;
+
+    const drawDino = () => {
+      ctx.fillStyle = "#2c3e50";
+      ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+
+      ctx.fillStyle = "#00796b";
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("Abdarrahim Elkarmani", dino.x - 10, dino.y - 10);
+    };
+
+    const drawObstacle = ob => {
+      ctx.fillStyle = "#e53935";
+      ctx.fillRect(ob.x, ob.y, ob.width, ob.height);
+    };
+
+    document.addEventListener("keydown", function(e) {
+      if (e.code === "Space" && !dino.jumping) {
+        dino.vy = -28;
+        dino.jumping = true;
+      }
+    });
+
+    const update = () => {
+      if (gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawDino();
+
+      dino.y += dino.vy;
+      dino.vy += gravity;
+
+      if (dino.y > ground) {
+        dino.y = ground;
+        dino.jumping = false;
+      }
+
+      if (frame % 100 === 0) {
+        obstacles.push({ x: canvas.width, y: ground, width: 20, height: 50 });
+      }
+
+      for (let ob of obstacles) {
+        ob.x -= 6;
+        drawObstacle(ob);
+
+        if (
+          dino.x < ob.x + ob.width &&
+          dino.x + dino.width > ob.x &&
+          dino.y < ob.y + ob.height
+        ) {
+          gameOver = true;
+          alert("Game Over! Score: " + score);
+        }
+      }
+
+      score++;
+      ctx.fillStyle = "#000";
+      ctx.font = "16px Segoe UI";
+      ctx.fillText("Score: " + score, 10, 20);
+
+      frame++;
+      requestAnimationFrame(update);
+    };
+
+    update();
+  </script>
+</body>
+</html>
